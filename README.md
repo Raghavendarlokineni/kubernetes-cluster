@@ -41,41 +41,65 @@ kubernetes-16-worker2         Ready    <none>   6m20s   v1.16.1
 
 Install a load balancer in the Kubernetes cluster, for this setup we are using Nginx - - https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md
 
+Clone the Nginx-ingress repo:
+```
 git clone https://github.com/nginxinc/kubernetes-ingress.git
-
+```
+Create namespace and service account for Ingress controller:
+`
 $ kubectl apply -f common/ns-and-sa.yaml
 namespace/nginx-ingress created
 serviceaccount/nginx-ingress created
-LAMU02WJ2MEHTD6:deployments rlokinen$ 
-LAMU02WJ2MEHTD6:deployments rlokinen$ kubectl apply -f common/default-server-secret.yaml
+`
+Create secret with TLS certificate and a key for default server in NGINX:
+`
+$ kubectl apply -f common/default-server-secret.yaml
 secret/default-server-secret created
-LAMU02WJ2MEHTD6:deployments rlokinen$ 
+`
+Create a config map, 
+`
 LAMU02WJ2MEHTD6:deployments rlokinen$ kubectl apply -f common/nginx-config.yaml
 configmap/nginx-config created
-LAMU02WJ2MEHTD6:deployments rlokinen$ 
-LAMU02WJ2MEHTD6:deployments rlokinen$ kubectl apply -f common/custom-resource-definitions.yaml
-customresourcedefinition.apiextensions.k8s.io/virtualservers.k8s.nginx.org created
-customresourcedefinition.apiextensions.k8s.io/virtualserverroutes.k8s.nginx.org created
-LAMU02WJ2MEHTD6:deployments rlokinen$ 
+`
+Configure RABC
+`
 $ kubectl apply -f rbac/rbac.yaml 
 clusterrole.rbac.authorization.k8s.io/nginx-ingress created
 clusterrolebinding.rbac.authorization.k8s.io/nginx-ingress created
-
-LAMU02WJ2MEHTD6:deployments rlokinen$ kubectl apply -f deployment/nginx-ingress.yaml
+`
+Create deployment
+`
+$ kubectl apply -f deployment/nginx-ingress.yaml
 deployment.apps/nginx-ingress created
-LAMU02WJ2MEHTD6:deployments rlokinen$ 
-LAMU02WJ2MEHTD6:deployments rlokinen$ kubectl get pods --namespace=nginx-ingress
-NAME                             READY   STATUS              RESTARTS   AGE
-nginx-ingress-7f4b784f79-s2jjl   0/1     ContainerCreating   0          20s
-LAMU02WJ2MEHTD6:deployments rlokinen$ kubectl get pods --namespace=nginx-ingress
-NAME                             READY   STATUS              RESTARTS   AGE
-nginx-ingress-7f4b784f79-s2jjl   0/1     ContainerCreating   0          27s
-LAMU02WJ2MEHTD6:deployments rlokinen$ kubectl create -f service/nodeport.yaml
+`
+Check the pod status
+`
+kubectl get pods --namespace=nginx-ingress
+NAME                             READY   STATUS    RESTARTS   AGE
+nginx-ingress-7f4b784f79-s2jjl   1/1     Running   8          82m
+`
+Create a service with node port to access the Ingress controller outside the cluster
+`
+$ kubectl create -f service/nodeport.yaml
 service/nginx-ingress created
-LAMU02WJ2MEHTD6:deployments rlokinen$ 
-LAMU02WJ2MEHTD6:deployments rlokinen$ kubectl get pods --namespace=nginx-ingress
-NAME                             READY   STATUS              RESTARTS   AGE
-nginx-ingress-7f4b784f79-s2jjl   0/1     ContainerCreating   0          50s
+`
+### Access the monitoring dashboard of Nginx
+
+By default, `stub_status` is available on port 8080. Use `kubectl port-forward` command to forward connections to port 8080 on your local machine to port 8080 of an NGINX ingress controller.
+
+`
+kubectl port-forward nginx-ingress-7f4b784f79-zxrlm 8080:8080 --namespace=nginx-ingress
+Forwarding from 127.0.0.1:8080 -> 8080
+Forwarding from [::1]:8080 -> 8080
+Handling connection for 8080
+Handling connection for 8080
+`
+
+
+
+
+
+
 
 
 
