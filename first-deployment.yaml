@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: demo-nginx
+  name: demo-nginx
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-nginx
+    spec:
+      containers:
+      - image: nginx:latest
+        imagePullPolicy: Always
+        name: nginx
+        ports:
+        - containerPort: 80
