@@ -174,6 +174,12 @@ nginx-deployment   1/1     1            1           9s
 nginx-training     1/1     1            1           38m
 ```
 
+creating a template from an available resource
+
+```
+kubectl get deployment demo-deployment -o yaml --export > deployment.yaml
+```
+
 $ kubectl expose deployment  nginx-deployment --port=80 --target-port=80 --type=NodePort --name=nginx-deployment-nodeport
 service/nginx-deployment-nodeport exposed
 lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get service
