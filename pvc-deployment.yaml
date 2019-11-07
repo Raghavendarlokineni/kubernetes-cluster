@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: demo-nginx-pvc
+  name: demo-nginx-pvc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-nginx-pvc
+    spec:
+      containers:
+      - image: nginx:latest
+        imagePullPolicy: Always
+        name: nginx
+        volumeMounts:
+        - mountPath: "/tmp"
+          name: my-volume
+        ports:
+        - containerPort: 80
+      volumes:
+        - name: my-volume
