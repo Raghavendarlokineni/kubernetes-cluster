@@ -246,3 +246,27 @@ Commercial support is available at
 </html>
 ```
 
+creating peristent volumes
+
+```
+$ kubectl apply -f persistent-volume.yaml -n tst                                                                             
+persistentvolume/pv-volume created
+
+$ kubectl get pv -n tsts
+NAME        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
+pv-volume   10Gi       RWO            Retain           Available           manual                  8s
+
+```
+
+creating peristent volume claims
+
+```
+$ kubectl apply -f persistent-volume-claim.yaml -n tst
+persistentvolumeclaim/pv-claim created
+
+
+$ kubectl get pvc -n tst
+NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+pv-claim   Bound    pvc-1decd296-012f-11ea-a594-42010a80015e   3Gi        RWO            standard       7s
+```
+
