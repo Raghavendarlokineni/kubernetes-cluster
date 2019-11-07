@@ -22,3 +22,5 @@ spec:
         - containerPort: 80
       volumes:
         - name: my-volume
+          persistentVolumeClaim:
+            claimName: pv-claim
