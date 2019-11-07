@@ -145,7 +145,27 @@ nginx-deployment-59b6fd499d-j6v4d   1/1     Running   0          23m   10.8.2.6 
 nginx-training-7f45db97b6-5slk7     1/1     Running   0          61m   10.8.1.3   gke-standard-cluster-1-default-pool-b5e24cb4-v5ff   <none>           <none>
 ```
 
+**setting to a context/namespace**
+```
+$ kubectl config set-context --current --namespace=tst
+Context "gke_vernal-reality-242816_us-central1-a_standard-cluster-1" modified.
 
+$ kubectl get pods
+NAME                                READY   STATUS              RESTARTS   AGE
+demo-nginx-7fdd948cc-5sp9b          1/1     Running             0          95m
+demo-nginx-pvc-6777769977-dzjcm     0/1     ContainerCreating   0          58m
+demo-nginx-pvc-6777769977-thfb8     1/1     Running             0          74m
+nginx-deployment-59b6fd499d-d8cjr   1/1     Running             0          22h
+
+$ kubectl get pods -n tst
+NAME                                READY   STATUS              RESTARTS   AGE
+demo-nginx-7fdd948cc-5sp9b          1/1     Running             0          95m
+demo-nginx-pvc-6777769977-dzjcm     0/1     ContainerCreating   0          58m
+demo-nginx-pvc-6777769977-thfb8     1/1     Running             0          74m
+nginx-deployment-59b6fd499d-d8cjr   1/1     Running             0          22h
+lokineni_raghavendar@cloudshell:~$
+
+```
 **delete pod if exists and create pod using a command**
 ```
 $ kubectl run --generator=run-pod/v1 nginx --image=raghavendar/docker-training:latest
