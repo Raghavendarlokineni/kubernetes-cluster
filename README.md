@@ -180,15 +180,17 @@ creating a template from an available resource
 kubectl get deployment demo-deployment -o yaml --export > deployment.yaml
 ```
 
+```
 $ kubectl expose deployment  nginx-deployment --port=80 --target-port=80 --type=NodePort --name=nginx-deployment-nodeport
 service/nginx-deployment-nodeport exposed
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get service
+
+$ kubectl get service
 NAME                        TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE
 kubernetes                  ClusterIP   10.12.0.1     <none>        443/TCP        3d16h
 nginx-deployment            ClusterIP   10.12.1.145   <none>        80/TCP         11m
 nginx-deployment-nodeport   NodePort    10.12.2.213   <none>        80:31002/TCP   16s
 
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl describe service nginx-deployment-nodeport
+$ kubectl describe service nginx-deployment-nodeport
 Name:                     nginx-deployment-nodeport
 Namespace:                default
 Labels:                   app=nginx-deployment
@@ -203,12 +205,44 @@ Endpoints:                10.8.2.6:80
 Session Affinity:         None
 External Traffic Policy:  Cluster
 Events:                   <none>
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ gcloud compute instances list
-NAME                                               ZONE           MACHINE_TYPE  PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP     STATUS
-gke-standard-cluster-1-default-pool-b5e24cb4-j23k  us-central1-a  g1-small                   10.128.0.14  35.223.131.125  RUNNING
-gke-standard-cluster-1-default-pool-b5e24cb4-v5ff  us-central1-a  g1-small                   10.128.0.15  35.239.188.73   RUNNING
-gke-standard-cluster-1-default-pool-b5e24cb4-xnfg  us-central1-a  g1-small                   10.128.0.16  34.69.48.4      RUNNING
+
+```
+
+access service using LoadBalancer IP
+```
+
+$ kubectl get service -n tst
+NAME                 TYPE           CLUSTER-IP    EXTERNAL-IP    PORT(S)        AGE
+demo-nginx-load      LoadBalancer   10.12.7.27    35.238.11.93   80:32415/TCP   5h31m
+demo-nginx-node      NodePort       10.12.6.120   <none>         80:32011/TCP   5h33m
+demo-nginx-service   ClusterIP      10.12.3.142   <none>         80/TCP         5h35m
 
 
+$ curl http://35.238.11.93:80
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
 ```
 
