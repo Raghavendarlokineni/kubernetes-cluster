@@ -270,3 +270,102 @@ NAME       STATUS   VOLUME                                     CAPACITY   ACCESS
 pv-claim   Bound    pvc-1decd296-012f-11ea-a594-42010a80015e   3Gi        RWO            standard       7s
 ```
 
+need for PVC
+```
+)$ kubectl get pods -n tst
+NAME                                READY   STATUS    RESTARTS   AGE
+demo-nginx-7fdd948cc-msmkn          1/1     Running   0          20h
+nginx-deployment-59b6fd499d-d8cjr   1/1     Running   0          20h
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ vi demo-deployment.yaml
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-7fdd948cc-msmkn /bin/bash
+Error from server (NotFound): pods "demo-nginx-7fdd948cc-msmkn" not found
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-7fdd948cc-msmkn /bin/bash -n tsts
+Error from server (NotFound): pods "demo-nginx-7fdd948cc-msmkn" not found
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-7fdd948cc-msmkn /bin/bash -n tst
+root@demo-nginx-7fdd948cc-msmkn:/#
+root@demo-nginx-7fdd948cc-msmkn:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@demo-nginx-7fdd948cc-msmkn:/# cd tmp
+root@demo-nginx-7fdd948cc-msmkn:/tmp# ls
+root@demo-nginx-7fdd948cc-msmkn:/tmp# touch hello
+root@demo-nginx-7fdd948cc-msmkn:/tmp# ls
+hello
+root@demo-nginx-7fdd948cc-msmkn:/tmp# exit
+exit
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl delete pod demo-nginx-7fdd948cc-msmkn -n tst
+pod "demo-nginx-7fdd948cc-msmkn" deleted
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ cp demo-deployment.yaml demo-deployment-pvc.yaml
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tsts
+No resources found.
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tst
+NAME                                READY   STATUS    RESTARTS   AGE
+demo-nginx-7fdd948cc-5sp9b          1/1     Running   0          40s
+nginx-deployment-59b6fd499d-d8cjr   1/1     Running   0          20h
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-7fdd948cc-5sp9b /bin/bash -n tst
+root@demo-nginx-7fdd948cc-5sp9b:/# cd tmp
+root@demo-nginx-7fdd948cc-5sp9b:/tmp# ls
+root@demo-nginx-7fdd948cc-5sp9b:/tmp#
+```
+
+persisting data
+
+```
+$ kubectl apply -f demo-deployment-pvc.yaml -n tst
+deployment.extensions/demo-nginx-pvc created
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tst
+NAME                                READY   STATUS    RESTARTS   AGE
+demo-nginx-7fdd948cc-5sp9b          1/1     Running   0          6m27s
+demo-nginx-pvc-5bcd8cc96c-vdz8k     1/1     Running   0          16s
+nginx-deployment-59b6fd499d-d8cjr   1/1     Running   0          20h
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-pvc-5bcd8cc96c-vdz8k /bin/bash -n tst
+root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/# cd /tmp
+root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# ls
+lost+found
+root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# touch hello
+root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# ls
+hello  lost+found
+root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# cat lost+found/
+cat: lost+found/: Is a directory
+root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# ls -ltr
+total 16
+drwx------ 2 root root 16384 Nov  7 07:35 lost+found
+-rw-r--r-- 1 root root     0 Nov  7 07:37 hello
+root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# exit
+exit
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl delete pod demo-nginx-pvc-5bcd8cc96c-vdz8k -n tst
+pod "demo-nginx-pvc-5bcd8cc96c-vdz8k" deleted
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tst
+NAME                                READY   STATUS              RESTARTS   AGE
+demo-nginx-7fdd948cc-5sp9b          1/1     Running             0          8m28s
+demo-nginx-pvc-5bcd8cc96c-mqdkl     0/1     ContainerCreating   0          11s
+nginx-deployment-59b6fd499d-d8cjr   1/1     Running             0          20h
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tst
+NAME                                READY   STATUS    RESTARTS   AGE
+demo-nginx-7fdd948cc-5sp9b          1/1     Running   0          8m54s
+demo-nginx-pvc-5bcd8cc96c-mqdkl     1/1     Running   0          37s
+nginx-deployment-59b6fd499d-d8cjr   1/1     Running   0          20h
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-pvc-5bcd8cc96c-mqdkl /bin/bash -n tst
+root@demo-nginx-pvc-5bcd8cc96c-mqdkl:/# cd /tmp
+root@demo-nginx-pvc-5bcd8cc96c-mqdkl:/tmp# ls
+hello  lost+found
+root@demo-nginx-pvc-5bcd8cc96c-mqdkl:/tmp#
+```
+
+creating secrets
+```
+$ kubectl get secrets -n tst
+NAME                  TYPE                                  DATA   AGE
+default-token-l4k2t   kubernetes.io/service-account-token   3      21h
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ vi secret.yaml
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl create -f secret.yaml -n tst
+secret/test-secret created
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get secrets -n tst
+NAME                  TYPE                                  DATA   AGE
+default-token-l4k2t   kubernetes.io/service-account-token   3      21h
+test-secret           Opaque                                1      4s
+lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ c
+```
+
+
