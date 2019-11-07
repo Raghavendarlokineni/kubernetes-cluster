@@ -1,7 +1,7 @@
 # kubernetes-cluster
 kubernetes cluster with GCP
 
-kubernetes cluster info
+### **kubernetes cluster info**
 ```
 $ kubectl get nodes
 NAME                                                STATUS   ROLES    AGE     VERSION
@@ -10,14 +10,14 @@ gke-standard-cluster-1-default-pool-b5e24cb4-v5ff   Ready    <none>   4m43s   v1
 gke-standard-cluster-1-default-pool-b5e24cb4-xnfg   Ready    <none>   4m41s   v1.13.10-gke.0
 ```
 
-create a namespace
+**create a namespace**
 
 ```
 $ kubectl create namespace training-1
 namespace/training-1 created
 ```
 
-get all resources supported by kubernetes
+**get all resources supported by kubernetes**
 ```
 $ kubectl api-resources
 NAME                              SHORTNAMES   APIGROUP                       NAMESPACED   KIND
@@ -79,7 +79,7 @@ storageclasses                    sc           storage.k8s.io                 fa
 volumeattachments                              storage.k8s.io                 false        VolumeAttachment
 ```
 
-get all the namespaces in the cluster
+**get all the namespaces in the cluster**
 
 ```
 $ kubectl get namespaces
@@ -90,24 +90,26 @@ kube-system   Active   18m
 training-1    Active   8m53s
 ```
 
-get the pods, by default `default` namespace pods are displayed.
+**get the pods, by default `default` namespace pods are displayed.**
 ```
 $ kubectl get pods
 No resources found.
 ```
-create a pod using file
+**create a pod using file**
 ```
 kubectl create -f basic.yaml
 pod/basicpod created
+
 $ kubectl get pods
 NAME       READY   STATUS              RESTARTS   AGE
 basicpod   0/2     ContainerCreating   0          4s
+
 $ kubectl get pods
 NAME       READY   STATUS    RESTARTS   AGE
 basicpod   2/2     Running   0          14s
 ```
 
-to get pods from all the namespaces
+**to get pods from all the namespaces**
 ```
 $ kubectl get pods --all-namespaces
 NAMESPACE     NAME                                                           READY   STATUS    RESTARTS   AGE
@@ -133,7 +135,7 @@ kube-system   prometheus-to-sd-v2pzp                                         1/1
 training-1    basicpod                                                       2/2     Running   0          3d14h
 
 ```
-to display pods running on different node
+**to display pods running on different node**
 
 ```
 $ kubectl get pods --output=wide -n default
@@ -144,7 +146,7 @@ nginx-training-7f45db97b6-5slk7     1/1     Running   0          61m   10.8.1.3 
 ```
 
 
-delete pod if exists and create pod using a command
+**delete pod if exists and create pod using a command**
 ```
 $ kubectl run --generator=run-pod/v1 nginx --image=raghavendar/docker-training:latest
 Error from server (AlreadyExists): pods "nginx" already exists
@@ -156,13 +158,13 @@ $ kubectl run --generator=run-pod/v1 nginx --image=raghavendar/docker-training:l
 pod/nginx created
 ```
 
-delete a deployment
+**delete a deployment**
 ```
 
 $ kubectl delete deployment nginx-deployment
 deployment.extensions "nginx-deployment" deleted
 ```
-create deployment using a command, get the deployments
+**create deployment using a command, get the deployments**
 ```
 $ kubectl create deployment nginx-deployment --image=raghavendar/docker-training:latest
 deployment.apps/nginx-deployment created
@@ -174,7 +176,7 @@ nginx-deployment   1/1     1            1           9s
 nginx-training     1/1     1            1           38m
 ```
 
-creating a template from an available resource
+**creating a template from an available resource**
 
 ```
 kubectl get deployment demo-deployment -o yaml --export > deployment.yaml
@@ -208,7 +210,7 @@ Events:                   <none>
 
 ```
 
-access service using LoadBalancer IP
+#### **access service using LoadBalancer IP**
 ```
 
 $ kubectl get service -n tst
@@ -246,7 +248,7 @@ Commercial support is available at
 </html>
 ```
 
-creating peristent volumes
+#### creating peristent volumes
 
 ```
 $ kubectl apply -f persistent-volume.yaml -n tst                                                                             
@@ -258,7 +260,7 @@ pv-volume   10Gi       RWO            Retain           Available           manua
 
 ```
 
-creating peristent volume claims
+#### creating peristent volume claims
 
 ```
 $ kubectl apply -f persistent-volume-claim.yaml -n tst
@@ -270,18 +272,15 @@ NAME       STATUS   VOLUME                                     CAPACITY   ACCESS
 pv-claim   Bound    pvc-1decd296-012f-11ea-a594-42010a80015e   3Gi        RWO            standard       7s
 ```
 
-need for PVC
+#### need for PVC
 ```
 )$ kubectl get pods -n tst
 NAME                                READY   STATUS    RESTARTS   AGE
 demo-nginx-7fdd948cc-msmkn          1/1     Running   0          20h
 nginx-deployment-59b6fd499d-d8cjr   1/1     Running   0          20h
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ vi demo-deployment.yaml
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-7fdd948cc-msmkn /bin/bash
-Error from server (NotFound): pods "demo-nginx-7fdd948cc-msmkn" not found
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-7fdd948cc-msmkn /bin/bash -n tsts
-Error from server (NotFound): pods "demo-nginx-7fdd948cc-msmkn" not found
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-7fdd948cc-msmkn /bin/bash -n tst
+
+
+$ kubectl exec -it demo-nginx-7fdd948cc-msmkn /bin/bash -n tst
 root@demo-nginx-7fdd948cc-msmkn:/#
 root@demo-nginx-7fdd948cc-msmkn:/# ls
 bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
@@ -292,80 +291,131 @@ root@demo-nginx-7fdd948cc-msmkn:/tmp# ls
 hello
 root@demo-nginx-7fdd948cc-msmkn:/tmp# exit
 exit
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl delete pod demo-nginx-7fdd948cc-msmkn -n tst
+
+
+$ kubectl delete pod demo-nginx-7fdd948cc-msmkn -n tst
 pod "demo-nginx-7fdd948cc-msmkn" deleted
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ cp demo-deployment.yaml demo-deployment-pvc.yaml
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tsts
-No resources found.
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tst
+
+
+$ kubectl get pods -n tst
 NAME                                READY   STATUS    RESTARTS   AGE
 demo-nginx-7fdd948cc-5sp9b          1/1     Running   0          40s
 nginx-deployment-59b6fd499d-d8cjr   1/1     Running   0          20h
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-7fdd948cc-5sp9b /bin/bash -n tst
+
+
+$ kubectl exec -it demo-nginx-7fdd948cc-5sp9b /bin/bash -n tst
 root@demo-nginx-7fdd948cc-5sp9b:/# cd tmp
 root@demo-nginx-7fdd948cc-5sp9b:/tmp# ls
 root@demo-nginx-7fdd948cc-5sp9b:/tmp#
 ```
 
-persisting data
+#### persisting data
 
 ```
 $ kubectl apply -f demo-deployment-pvc.yaml -n tst
 deployment.extensions/demo-nginx-pvc created
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tst
+
+$ kubectl get pods -n tst
 NAME                                READY   STATUS    RESTARTS   AGE
 demo-nginx-7fdd948cc-5sp9b          1/1     Running   0          6m27s
 demo-nginx-pvc-5bcd8cc96c-vdz8k     1/1     Running   0          16s
 nginx-deployment-59b6fd499d-d8cjr   1/1     Running   0          20h
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-pvc-5bcd8cc96c-vdz8k /bin/bash -n tst
+
+$ kubectl exec -it demo-nginx-pvc-5bcd8cc96c-vdz8k /bin/bash -n tst
 root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/# cd /tmp
 root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# ls
 lost+found
 root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# touch hello
 root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# ls
 hello  lost+found
-root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# cat lost+found/
-cat: lost+found/: Is a directory
 root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# ls -ltr
 total 16
 drwx------ 2 root root 16384 Nov  7 07:35 lost+found
 -rw-r--r-- 1 root root     0 Nov  7 07:37 hello
 root@demo-nginx-pvc-5bcd8cc96c-vdz8k:/tmp# exit
 exit
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl delete pod demo-nginx-pvc-5bcd8cc96c-vdz8k -n tst
+
+$ kubectl delete pod demo-nginx-pvc-5bcd8cc96c-vdz8k -n tst
 pod "demo-nginx-pvc-5bcd8cc96c-vdz8k" deleted
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tst
+
+$ kubectl get pods -n tst
 NAME                                READY   STATUS              RESTARTS   AGE
 demo-nginx-7fdd948cc-5sp9b          1/1     Running             0          8m28s
 demo-nginx-pvc-5bcd8cc96c-mqdkl     0/1     ContainerCreating   0          11s
 nginx-deployment-59b6fd499d-d8cjr   1/1     Running             0          20h
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get pods -n tst
+$ kubectl get pods -n tst
 NAME                                READY   STATUS    RESTARTS   AGE
 demo-nginx-7fdd948cc-5sp9b          1/1     Running   0          8m54s
 demo-nginx-pvc-5bcd8cc96c-mqdkl     1/1     Running   0          37s
 nginx-deployment-59b6fd499d-d8cjr   1/1     Running   0          20h
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl exec -it demo-nginx-pvc-5bcd8cc96c-mqdkl /bin/bash -n tst
+
+$ kubectl exec -it demo-nginx-pvc-5bcd8cc96c-mqdkl /bin/bash -n tst
 root@demo-nginx-pvc-5bcd8cc96c-mqdkl:/# cd /tmp
 root@demo-nginx-pvc-5bcd8cc96c-mqdkl:/tmp# ls
 hello  lost+found
 root@demo-nginx-pvc-5bcd8cc96c-mqdkl:/tmp#
 ```
 
-creating secrets
+#### creating secrets
 ```
 $ kubectl get secrets -n tst
 NAME                  TYPE                                  DATA   AGE
 default-token-l4k2t   kubernetes.io/service-account-token   3      21h
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ vi secret.yaml
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl create -f secret.yaml -n tst
+
+
+$ kubectl create -f secret.yaml -n tst
 secret/test-secret created
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ kubectl get secrets -n tst
+
+$ kubectl get secrets -n tst
 NAME                  TYPE                                  DATA   AGE
 default-token-l4k2t   kubernetes.io/service-account-token   3      21h
 test-secret           Opaque                                1      4s
-lokineni_raghavendar@cloudshell:~ (vernal-reality-242816)$ c
 ```
 
+#### scaling replicas from command line
+
+```
+
+$kubectl autoscale deployment php-apache --min=2 --max=10 --cpu-percent=10
+
+$ kubectl get pods
+NAME                                READY   STATUS              RESTARTS   AGE
+demo-deployment-75996f6ccf-259nq    1/1     Running             0          8d
+demo-nginx-7fdd948cc-n5nrj          1/1     Running             0          4d3h
+nginx                               1/1     Running             0          22h
+nginx-cli-75f844cf5f-tqsdj          1/1     Running             0          8d
+nginx-deployment-59b6fd499d-j6v4d   1/1     Running             0          8d
+nginx-training-7f45db97b6-5slk7     1/1     Running             0          8d
+php-apache-6b565b5d5-42ps7          0/1     Pending             0          40m
+php-apache-6b565b5d5-5kvx9          0/1     Pending             0          40m
+php-apache-6b565b5d5-7qprm          1/1     Running             0          40m
+php-apache-6b565b5d5-ggpw5          1/1     Running             0          43m
+php-apache-6b565b5d5-l8hmv          0/1     Pending             0          40m
+php-apache-6b565b5d5-zvs7r          0/1     ContainerCreating   0          39m
+
+$ kubectl scale --replicas=1 deployment php-apache
+deployment.extensions/php-apache scaled
+
+$ kubectl get pods
+NAME                                READY   STATUS        RESTARTS   AGE
+demo-deployment-75996f6ccf-259nq    1/1     Running       0          8d
+demo-nginx-7fdd948cc-n5nrj          1/1     Running       0          4d3h
+nginx                               1/1     Running       0          22h
+nginx-cli-75f844cf5f-tqsdj          1/1     Running       0          8d
+nginx-deployment-59b6fd499d-j6v4d   1/1     Running       0          8d
+nginx-training-7f45db97b6-5slk7     1/1     Running       0          8d
+php-apache-6b565b5d5-7qprm          0/1     Terminating   0          42m
+php-apache-6b565b5d5-ggpw5          1/1     Running       0          44m
+php-apache-6b565b5d5-zvs7r          0/1     Terminating   0          40m
+
+$ kubectl get pods
+NAME                                READY   STATUS    RESTARTS   AGE
+demo-deployment-75996f6ccf-259nq    1/1     Running   0          8d
+demo-nginx-7fdd948cc-n5nrj          1/1     Running   0          4d3h
+nginx                               1/1     Running   0          22h
+nginx-cli-75f844cf5f-tqsdj          1/1     Running   0          8d
+nginx-deployment-59b6fd499d-j6v4d   1/1     Running   0          8d
+nginx-training-7f45db97b6-5slk7     1/1     Running   0          8d
+php-apache-6b565b5d5-ggpw5          1/1     Running   0          44m
+```
 
