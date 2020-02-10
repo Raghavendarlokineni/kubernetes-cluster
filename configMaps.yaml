@@ -1,0 +1,61 @@
+LAMU02WJ2MEHTD6:kind-cluster rlokinen$ cat deployment-demo.yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: demo-nginx
+  name: demo-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-nginx
+  template:
+    metadata:
+      labels:
+        app: demo-nginx
+    spec:
+      containers:
+      - name: fdlogger
+        image: fluent/fluentd
+        volumeMounts:
+        - mountPath: /var/log
+          name: weblog-volume-claim
+      - image: nginx:latest
+        volumeMounts:
+        - mountPath: /etc/cars
+          name: car-vol
+        - mountPath: /opt
+          name: pvc-volume
+        - mountPath: /var/log/nginx
+          name: weblog-volume-claim
+        env:
+          - name: ENV
+            valueFrom:
+              configMapKeyRef:
+                name: colors
+                key: favorite
+        envFrom:
+        - configMapRef:
+            name: colors
+        imagePullPolicy: Always
+        name: nginx
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          exec:
+            command:
+            - ls
+            - /etc/cars 
+          periodSeconds: 5 
+      volumes:
+      - name: car-vol
+        configMap:
+          defaultMode: 420
+          name: fast-car
+      - name: pvc-volume
+        persistentVolumeClaim:
+          claimName: pvc-claim 
+      - name: weblog-volume-claim
+        persistentVolumeClaim:
+          claimName: weblog-volume
